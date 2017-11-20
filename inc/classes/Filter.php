@@ -20,7 +20,7 @@ class Filter {
 		}
 
 	public static function Email ( $email ) {
-		return filter_val( $email, FILTER_SANITIZE_EMAIL);
+		return filter_var( $email, FILTER_SANITIZE_EMAIL );
 	}
 
 
@@ -29,7 +29,7 @@ class Filter {
 	}
 
 	public static function Int ( $integer ) {
-		return (int) $integer = filter_val( $integer, FILTER_SANITIZE_NUMBER_INT);
+		return (int) $integer = filter_var( $integer, FILTER_SANITIZE_NUMBER_INT);
 	}
 
 }

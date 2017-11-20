@@ -16,14 +16,10 @@
 
 		$email = Filter::String( $_POST['email'] );
 
-		// Make sure the user doesn't exist.
-		$findUser = $con->prepare("SELECT user_id FROM users WHERE email = LOWER(:email) LIMIT 1"); // With PDO you can pull variable outside of SQL statement which means less SQL injection chance.
-		$findUser->bindParam(':email', $email, PDO::PARAM_STR); // Bind parameter. $email must be a variable (PDO)
-		$findUser->execute();
-
+		$user_found = User::Find($email);
 
 		// Check if user exists.
-		if($findUser->rowCount() == 1 ) { 
+		if($user_found) { 
 			$return['error'] = "Account already exists.";
 		} else {
 

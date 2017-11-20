@@ -5,8 +5,6 @@
 	// Require the config
 	require_once "inc/config.php"; 
 
-	ForceDashboard();
-
 ?>
 
 <!DOCTYPE html>

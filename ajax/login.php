@@ -17,18 +17,13 @@
 		$email = Filter::String( $_POST['email'] );
 		$password = $_POST['password'];
 
-		// Make sure the user doesn't exist.
-		$findUser = $con->prepare("SELECT user_id, password FROM users WHERE email = LOWER(:email) LIMIT 1"); // With PDO you can pull variable outside of SQL statement which means less SQL injection chance.
-		$findUser->bindParam(':email', $email, PDO::PARAM_STR); // Bind parameter. $email must be a variable (PDO)
-		$findUser->execute();
+		$user_found = User::Find($email, true);
 
+		// Check if user exists.
+		if($user_found) { 
 
-		// Check if user exists. If user exists, sign them in.
-		if($findUser->rowCount() == 1 ) { 
-			$User = $findUser->fetch(PDO::FETCH_ASSOC);
-
-			$user_id = (int) $User['user_id'];
-			$hash = (string) $User['password'];
+			$user_id = (int) $user_found['user_id'];
+			$hash = (string) $user_found['password'];
 
 
 			if(password_verify($password, $hash)) { 
@@ -44,7 +39,6 @@
 			}
 
 
-			$return['error'] = "Account already exists.";
 		} else {
 			// Create a new account.
 			$return['error'] = "You do not have an account. <a href='/register.php'>Create one now?</a>";
