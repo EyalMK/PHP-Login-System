@@ -9,18 +9,42 @@
 	if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 		// Always Return JSON Format.
-		header('Content-Type: application/json');
+		// header('Content-Type: application/json');
 
 		$return = [];
 
+
+		$email = Filter::String( $_POST['email'] );
+
 		// Make sure the user doesn't exist.
+		$findUser = $con->prepare("SELECT user_id FROM users WHERE email = LOWER(:email) LIMIT 1"); // With PDO you can pull variable outside of SQL statement which means less SQL injection chance.
+		$findUser->bindParam(':email', $email, PDO::PARAM_STR); // Bind parameter. $email must be a variable (PDO)
+		$findUser->execute();
 
 
-		// Make sure the user can be added and is added.
+		// Check if user exists.
+		if($findUser->rowCount() == 1 ) { 
+			$return['error'] = "Account already exists.";
+		} else {
+
+			// User doesn't exist. Add them.
+
+			$password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Hash the password for security.
 
 
-		// Return the appropriate information back to JavaScript to redirect us.
-		$return['redirect'] = '/dashboard.php';
+			$addUser = $con->prepare("INSERT INTO users(email, password) VALUES(LOWER(:email), :password)");
+			$addUser->bindParam(':email', $email, PDO::PARAM_STR);
+			$addUser->bindParam(':password', $password, PDO::PARAM_STR);
+			$addUser->execute();
+
+			$user_id = $con->lastInsertId();
+
+			$_SESSION['user_id'] = (int) $user_id;
+
+			// Return the appropriate information back to JavaScript to redirect us.
+			$return['redirect'] = '/dashboard.php?message=welcome';
+
+		}
 
 
 
@@ -31,7 +55,7 @@
 
 
 	} else {
-		exit('test');
+		exit('Invalid URL');
 	}
 
 
